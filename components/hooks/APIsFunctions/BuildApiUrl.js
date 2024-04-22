@@ -6,7 +6,6 @@ export function BuildApiUrl(apiRequest, constants) {
     return null; // or some default value or throw an error, depending on your use case
   }
 
-
   const queryParam = apiRequest.dashboardFormSchemaActionQueryParams
     .map(
       (param) =>
@@ -15,5 +14,6 @@ export function BuildApiUrl(apiRequest, constants) {
     .join("&");
 
   const apiUrl = `${baseURL}/${apiRequest.routeAdderss}?${queryParam}`;
+  console.log(apiUrl);
   return apiUrl;
 }

@@ -32,7 +32,7 @@ const RenderInputField = ({ input, info, setInfo }) => {
   const [birthday, setBirthday] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [numberPrefix, setNumberPrefix] = useState("+91");
-  const [address, setAddress] = useState();
+  const [open, setOpen] = useState(false);
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
@@ -268,7 +268,15 @@ const RenderInputField = ({ input, info, setInfo }) => {
           </View>
         </View>
       ) : input.type === "comboBox" ? (
-        <ComboBox />
+        {
+          /* <ComboBox
+          label={"sd"}
+          open={open}
+          setOpen={setOpen}
+          compoBoxTitle={"Hello again you have been missed"}
+          dashboardFormSchemaID={"4772B7BF-C8E6-42CD-935F-08AB494A35E6"}
+        /> */
+        }
       ) : input.type === "password" ? (
         <View style={{ marginBottom: 12 }}>
           <View

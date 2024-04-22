@@ -1,174 +1,165 @@
 import {
-  Alert,
-  ImageBackground,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
   View,
+  Text,
+  Image,
+  Pressable,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaViewBase,
+  SafeAreaView,
 } from "react-native";
-import homeImage from "../assets/home-image.jpg";
-import { useContext, useEffect } from "react";
-import { GlobalContext } from "../context/index";
+import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import Button from "../components/InputComponents/Button";
+import COLORS from "../context/colors";
+import ComboBox from "../components/InputComponents/ComboBox";
+// import { SafeAreaView } from "react-native-safe-area-context";
+import Checkbox from "expo-checkbox";
 
-export default function Login({ navigation }) {
-  const {
-    showLoginView,
-    setShowLoginView,
-    currentUserName,
-    setCurrentUserName,
-    currentUser,
-    setCurrentUser,
-    allUsers,
-    setAllUsers,
-  } = useContext(GlobalContext);
-
-  function handleRegisterAndSignIn(isLogin) {
-    if (currentUserName.trim() !== "") {
-      const index = allUsers.findIndex(
-        (userItem) => userItem === currentUserName
-      );
-
-      if (isLogin) {
-        if (index === -1) {
-          Alert.alert("Please register first");
-        } else {
-          setCurrentUser(currentUserName);
-        }
-      } else {
-        if (index === -1) {
-          allUsers.push(currentUserName);
-          setAllUsers(allUsers);
-          setCurrentUser(currentUserName);
-        } else {
-          Alert.alert("Already registered ! Please login");
-        }
-      }
-
-      setCurrentUserName("");
-    } else {
-      Alert.alert("User name field is empty");
-    }
-
-    Keyboard.dismiss();
-  }
-
-  useEffect(() => {
-    if (currentUser.trim() !== "") navigation.navigate("Chatscreen");
-  }, [currentUser]);
-
-  console.log(allUsers, currentUser);
+const CompanyRegistration = ({ navigation }) => {
+  const [isPasswordShown, setIsPasswordShown] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <View style={styles.mainWrapper}>
-      <ImageBackground source={homeImage} style={styles.homeImage} />
-      <View style={styles.content}>
-        {showLoginView ? (
-          <View style={styles.infoBlock}>
-            <View style={styles.loginInputContainer}>
-              <Text style={styles.heading}>Enter Your User Name</Text>
-              <TextInput
-                autoCorrect={false}
-                placeholder="Enter your user name"
-                style={styles.loginInput}
-                onChangeText={(value) => setCurrentUserName(value)}
-                value={currentUserName}
-              />
-            </View>
-            <View style={styles.buttonWrapper}>
-              <Pressable
-                onPress={() => handleRegisterAndSignIn(false)}
-                style={styles.button}
-              >
-                <View>
-                  <Text style={styles.buttonText}>Register</Text>
-                </View>
-              </Pressable>
-              <Pressable
-                onPress={() => handleRegisterAndSignIn(true)}
-                style={styles.button}
-              >
-                <View>
-                  <Text style={styles.buttonText}>Login</Text>
-                </View>
-              </Pressable>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.infoBlock}>
-            <Text style={styles.heading}>Connect , Grow and Inspire</Text>
-            <Text style={styles.subHeading}>
-              Connect people around the world for free
-            </Text>
-            <Pressable
-              style={styles.button}
-              onPress={() => setShowLoginView(true)}
-            >
-              <View>
-                <Text style={styles.buttonText}>Get Started</Text>
-              </View>
-            </Pressable>
-          </View>
-        )}
-      </View>
-    </View>
-  );
-}
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+      <View style={{ flex: 1, marginHorizontal: 22 }}>
+        <View style={{ marginVertical: 22 }}>
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              marginVertical: 12,
+              color: COLORS.black,
+            }}
+          >
+            Hi Welcome Back ! 👋
+          </Text>
 
-const styles = StyleSheet.create({
-  mainWrapper: {
-    flex: 1,
-  },
-  homeImage: {
-    width: "100%",
-    flex: 2,
-    justifyContent: "center",
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    backgroundColor: "#fff",
-  },
-  infoBlock: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 10,
-  },
-  subHeading: {
-    fontSize: 15,
-    color: "#acacac",
-    marginBottom: 15,
-  },
-  loginInput: {
-    borderRadius: 50,
-    borderWidth: 1,
-    padding: 8,
-  },
-  button: {
-    backgroundColor: "#703efe",
-    padding: 15,
-    marginVertical: 10,
-    width: "34%",
-    elevation: 1,
-    borderRadius: 50,
-  },
-  buttonWrapper: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  buttonText: {
-    textAlign: "center",
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 15,
-  },
-});
+          <Text
+            style={{
+              fontSize: 16,
+              color: COLORS.black,
+            }}
+          >
+            Hello again you have been missed!
+          </Text>
+        </View>
+        <ComboBox
+          label={"sd"}
+          open={open}
+          setOpen={setOpen}
+          compoBoxTitle={"Hello again you have been missed"}
+          dashboardFormSchemaID={"4772B7BF-C8E6-42CD-935F-08AB494A35E6"}
+        />
+        <View style={{ marginBottom: 12 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 400,
+              marginVertical: 8,
+            }}
+          >
+            User name
+          </Text>
+
+          <View
+            style={{
+              width: "100%",
+              height: 48,
+              borderColor: COLORS.black,
+              borderWidth: 1,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: 22,
+            }}
+          >
+            <TextInput
+              placeholder="Enter your username"
+              placeholderTextColor={COLORS.black}
+              keyboardType="email-address"
+              style={{
+                width: "100%",
+              }}
+            />
+          </View>
+        </View>
+        <View style={{ marginBottom: 12 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 400,
+              marginVertical: 8,
+            }}
+          >
+            Password
+          </Text>
+
+          <View
+            style={{
+              width: "100%",
+              height: 48,
+              borderColor: COLORS.black,
+              borderWidth: 1,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: 22,
+            }}
+          >
+            <TextInput
+              placeholder="Enter your password"
+              placeholderTextColor={COLORS.black}
+              secureTextEntry={isPasswordShown}
+              style={{
+                width: "100%",
+              }}
+            />
+
+            <TouchableOpacity
+              onPress={() => setIsPasswordShown(!isPasswordShown)}
+              style={{
+                position: "absolute",
+                right: 12,
+              }}
+            >
+              {isPasswordShown == true ? (
+                <Ionicons name="eye-off" size={24} color={COLORS.black} />
+              ) : (
+                <Ionicons name="eye" size={24} color={COLORS.black} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            marginVertical: 6,
+          }}
+        >
+          <Checkbox
+            style={{ marginRight: 8 }}
+            value={isChecked}
+            onValueChange={setIsChecked}
+            color={isChecked ? COLORS.primary : undefined}
+          />
+
+          <Text>Remenber Me</Text>
+        </View>
+
+        <Button
+          title="Login"
+          filled
+          style={{
+            marginTop: 18,
+            marginBottom: 4,
+          }}
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default CompanyRegistration;

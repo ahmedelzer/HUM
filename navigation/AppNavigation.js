@@ -8,12 +8,12 @@ import { StatusBar } from "expo-status-bar";
 import Add from "../screens/Add";
 import Rooms from "../screens/Rooms";
 import Room from "../screens/Room";
-import Login from "../screens/Login";
+import LoginWS from "../screens/LoginWS";
 import Chatscreen from "../screens/Chatscreen";
 import Messagescreen from "../screens/Messagescreen";
 
 import GlobalState from "../context";
-import CompanyRegistration from "../screens/CompanyRegistration";
+import Login from "../screens/Login";
 import Signup from "../screens/Signup";
 const Stack = createNativeStackNavigator();
 
@@ -21,9 +21,8 @@ export default function AppNavigation() {
   return (
     <GlobalState>
       <NavigationContainer>
-        <Header />
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName="Login"
           screenOptions={{
             headerShown: false,
           }}
@@ -38,7 +37,7 @@ export default function AppNavigation() {
           />
           <Stack.Screen
             name="Homescreen"
-            component={Login}
+            component={LoginWS}
             options={{ headerShown: false }}
           />
           <Stack.Screen
@@ -48,7 +47,7 @@ export default function AppNavigation() {
           />
           <Stack.Screen
             name="Login"
-            component={CompanyRegistration}
+            component={Login}
             options={{
               headerShown: false,
             }}
@@ -62,7 +61,6 @@ export default function AppNavigation() {
           />
           <Stack.Screen name="Messagescreen" component={Messagescreen} />
         </Stack.Navigator>
-        <Footer />
       </NavigationContainer>
       <StatusBar style="light" animated={true} hidden={true} />
     </GlobalState>

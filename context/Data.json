@@ -1,6 +1,4 @@
-
 {
-  
   "UserInfo": [
     {
       "title": "First Name",
@@ -68,6 +66,7 @@
   "CompanyInfo": [
     {
       "title": "Company Name",
+      "schemaID": "4772B7BF-C8E6-42CD-935F-08AB494A35E6",
       "placeholder": "Enter Company Name",
       "fieldName": "companyName",
       "type": "text"
@@ -84,10 +83,9 @@
       "title": "areaID",
       "placeholder": "Enter areaID",
       "fieldName": "areaID",
-      "schemaID":"4772b7bf-c8e6-42cd-935f-08ab494a35e6",
-      "displayField":"areaName",
+      "schemaID": "4772b7bf-c8e6-42cd-935f-08ab494a35e6",
+      "displayField": "areaName",
       "type": "comboBox"
-      
     },
     {
       "title": "Street Name",

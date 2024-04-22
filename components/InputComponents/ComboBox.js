@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useReducer } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,76 +6,199 @@ import {
   Button,
   Modal,
   TouchableHighlight,
+  TextInput,
 } from "react-native";
+import Reducer from "../Reducer";
 import axios from "axios";
 import { BuildApiUrl } from "../hooks/APIsFunctions/BuildApiUrl";
 import UseFetch from "../hooks/APIsFunctions/UseFetch";
 import { DataSourceAPI } from "../DataSourceAPI";
+import COLORS from "../../context/colors";
 
+const VIRTUAL_PAGE_SIZE = 3;
+const MAX_ROWS = 50000;
+const initialState = {
+  rows: [],
+  skip: 0,
+  requestedSkip: 0,
+  take: VIRTUAL_PAGE_SIZE * 2,
+  totalCount: 0,
+  loading: false,
+  lastQuery: "",
+};
 const ComboBox = ({
   dashboardFormSchemaID,
-  displayField,
-  getField,
-  onSelect,
+  // displayField,
+  open,
+  setOpen,
+  label,
+  compoBoxTitle,
+  // getField,
+  // onSelect,
 }) => {
-  // const [loading, setLoading] = useState(true);
-  // const [data, setData] = useState([]);
-  const [selectedValue, setSelectedValue] = useState("Java");
-
-  const handleValueChange = (value) => {
-    setSelectedValue(value);
-    console.log(value);
-  };
-  const { data, loading, error } = UseFetch(
-    "https://jsonplaceholder.typicode.com/posts"
+  const {
+    data: schemaActions,
+    error,
+    isLoading,
+  } = UseFetch(
+    `/api/Dashboard/GetDashboardSchemaActionsBySchemaID?DashboardSchemaID=${dashboardFormSchemaID}`,
+    "Centralization"
   );
-  console.log(data);
-  if (error) {
-    return <Text>Error: {error.message}</Text>;
-  }
-  let d = [
-    { label: "TypeScript", value: "JavaScript", key: 1, color: "green" },
-    { label: "TypeScript", value: "TypeScript", key: 2, color: "green" },
-    { label: "Python", value: "Python", key: 3, color: "green" },
-    { label: "Java", value: "Java", key: 4, color: "green" },
-  ];
+  const dataSourceAPI = (query, skip, take) =>
+    BuildApiUrl(query, {
+      pageIndex: skip / take + 1,
+      pageSize: take,
+    });
+  // SetReoute(schema.projectProxyRoute);
+
+  const getAction =
+    schemaActions &&
+    schemaActions.find(
+      (action) => action.dashboardFormActionMethodType === "Get"
+    );
+  const createRowCache = (size) => {
+    // Initialize an empty array to store the row cache
+    const rowCache = [];
+
+    // Generate rows and add them to the cache
+    for (let i = 0; i < size; i++) {
+      // Example: Each row is an object with an ID and data
+      const row = {
+        id: i,
+        data: `Row ${i + 1}`,
+      };
+      rowCache.push(row);
+    }
+
+    // Return the populated row cache
+    return rowCache;
+  };
+  const cache = useMemo(() => createRowCache(VIRTUAL_PAGE_SIZE));
+  const [state, dispatch] = useReducer(Reducer, initialState);
+  const updateRows = (skip, count, newTotalCount) => {
+    dispatch({
+      type: "UPDATE_ROWS",
+      payload: {
+        skip,
+        rows: cache.getRows(skip, count),
+        totalCount: newTotalCount < MAX_ROWS ? newTotalCount : MAX_ROWS,
+      },
+    });
+  };
+  const loadData = () => {
+    const { requestedSkip, take, lastQuery, loading } = state;
+    const query = dataSourceAPI(getAction, requestedSkip, take);
+    console.log("dataSourceAPI", query);
+    if (query !== lastQuery && !loading) {
+      const cached = cache.getRows(requestedSkip, take);
+      if (cached.length === take) {
+        updateRows(requestedSkip, take);
+      } else {
+        dispatch({ type: "FETCH_INIT" });
+        fetch(query)
+          .then((response) => response.json())
+          .then(({ dataSource, count }) => {
+            cache.setRows(requestedSkip, dataSource);
+            updateRows(requestedSkip, take, count);
+          })
+          .catch(() => dispatch({ type: "REQUEST_ERROR" }));
+        // var response =  fetchDataWithHandling(query, 'GET');
+        // response === 'REQUEST_ERROR'? (dispatch({ type: 'REQUEST_ERROR' })):
+        // (
+        //   cache.setRows(requestedSkip, response.dataSource);
+        //     updateRows(requestedSkip, take, response.count);
+        // )
+      }
+      dispatch({ type: "UPDATE_QUERY", payload: query });
+    }
+  };
+
+  useEffect(() => loadData());
+  // const { rows } = state;
+  // // const [loading, setLoading] = useState(true);
+  // // const [data, setData] = useState([]);
+  // const [selectedValue, setSelectedValue] = useState("Java");
+
+  // if (error) {
+  //   return <Text>Error: {error.message}</Text>;
+  // }
+
   return (
-    <View style={styles.container}>
-      <Modal visible={true} animationType={"slide"} transparent={true}>
-        <View
+    <View>
+      <View style={{ marginBottom: 12 }} onTouchEnd={() => setOpen(true)}>
+        <Text
           style={{
-            margin: 20,
-            padding: 20,
-            backgroundColor: "#efefef",
-            bottom: 20,
-            left: 20,
-            right: 20,
-            alignItems: "center",
-            position: "absolute",
+            fontSize: 16,
+            fontWeight: 400,
+            marginVertical: 8,
           }}
         >
-          <Text>Please pick a value</Text>
-          {d.map((value, index) => {
-            return (
-              <TouchableHighlight
-                key={index}
-                onPress={() => setSelectedValue(value.value)}
-                style={{ paddingTop: 4, paddingBottom: 4 }}
-              >
-                <Text>{value.label}</Text>
-              </TouchableHighlight>
-            );
-          })}
+          {label}
+        </Text>
 
-          <TouchableHighlight
-            onPress={console.log("done")}
-            style={{ paddingTop: 4, paddingBottom: 4 }}
-          >
-            <Text style={{ color: "#999" }}>Cancel</Text>
-          </TouchableHighlight>
+        <View
+          style={{
+            width: "100%",
+            height: 48,
+            borderColor: COLORS.black,
+            borderWidth: 1,
+            borderRadius: 8,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingLeft: 22,
+          }}
+        >
+          {/* <TextInput
+            editable={false}
+            value={selectedValue}
+            placeholder={`${label}`}
+            placeholderTextColor={COLORS.black}
+            keyboardType="email-address"
+            style={{
+              width: "100%",
+            }}
+          /> */}
         </View>
-      </Modal>
-      {/* {loading && <ActivityIndicator size="large" color="#0000ff" />} */}
+      </View>
+      <View style={styles.container}>
+        <Modal visible={open} animationType={"slide"} transparent={true}>
+          <View
+            style={{
+              margin: 20,
+              padding: 20,
+              backgroundColor: "#efefef",
+              bottom: 20,
+              left: 20,
+              right: 20,
+              alignItems: "center",
+              position: "absolute",
+            }}
+          >
+            <Text>{compoBoxTitle}</Text>
+            {/* {rows.map((value, index) => {
+              return (
+                <TouchableHighlight
+                  key={index}
+                  onPress={() => setSelectedValue(value.value)}
+                  style={{ paddingTop: 4, paddingBottom: 4 }}
+                >
+                  <Text>{value.label}</Text>
+                </TouchableHighlight>
+              );
+            })} */}
+
+            <TouchableHighlight
+              onPress={console.log("done")}
+              style={{ paddingTop: 4, paddingBottom: 4 }}
+            >
+              <Text onPress={() => setOpen(false)} style={{ color: "#999" }}>
+                Cancel
+              </Text>
+            </TouchableHighlight>
+          </View>
+        </Modal>
+        {/* {loading && <ActivityIndicator size="large" color="#0000ff" />} */}
+      </View>
     </View>
   );
 };

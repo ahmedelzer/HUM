@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 // import axios from "axios";
 import { baseURL, request } from "../../../request";
 
-const UseFetch = (url) => {
+const UseFetch = (url, projectRoute) => {
   console.log("url", url);
-  const realurl = `${url}`;
+  const realurl = `${baseURL}${projectRoute + url}`;
   console.log("realurl", realurl);
   // const realurl = url;
   //base_URL = "";
